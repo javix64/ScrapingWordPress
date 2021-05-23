@@ -4,34 +4,57 @@ const fs = require('fs');
 const partialSite = process.argv[2]
 const site = 'https://'+partialSite+'/wp-json/wp/v2/'
 
-let posts = site+'posts?per_page=100&page=';
-let pages = site+'pages?per_page=100&page=';
-axios.get(posts+1).then(r=>{
-    let totalPages = parseInt(r.headers['x-wp-totalpages']);
-    //obtengo el numero total de paginas
-    // hago un bucle para que entre en cada una de las paginas y saquen todos los posts
-    let promiseArr = [];
-    for (let i = 1; i < totalPages+1; i++) {
-        console.log('entro en el bucle',i);
-        promiseArr.push(axios.get(posts+1));
-    }
-    console.log(promiseArr);
-    Promise.all(promiseArr).then(res =>{
-        let postsJSON = [];
-        let arrayJson = {};
-        res.forEach(e=>{
-            let arr = e.data;
-            arr.forEach(e => {
-                let post = {
-                    url : e.link
+const postOrPage = ['posts','pages'];
+let websPagesOrPosts = '?per_page=100';
+
+let paginationPages = 0;
+let paginationPosts = 0;
+let arrPages = [];
+let arrPosts = [];
+axios.get(site+postOrPage[0]+websPagesOrPosts).then(r=>{
+    paginationPosts = parseInt(r.headers['x-wp-totalpages']);
+    console.log('Total posts: ',parseInt(r.headers['x-wp-total']))
+    for (let i = 1; i < paginationPosts+1; i++) {
+        axios.get(site+postOrPage[0]+websPagesOrPosts+'&page='+i).then(r=>{
+            r.data.forEach(e => {
+                let data = {
+                    title : e.title.rendered,
+                    link : e.link,
+                    content : e.content.rendered
                 }
-                postsJSON.push(post);
-                arrayJson.post= post;
-                arrayJson= postsJSON;
-                const data = JSON.stringify(arrayJson);
-            })
+                arrPosts.push(data);
+            });
+        }).then( r=> {
+            let jsonPosts = {};
+            jsonPosts.posts = arrPosts;
+            fs.writeFileSync('posts.json',JSON.stringify(jsonPosts));
+            if(paginationPosts===i){
+                console.log('All posts written!');
+            }
         })
-    })
-    
-});
-//content : e.content.rendered
+    }
+})
+
+axios.get(site+postOrPage[1]+websPagesOrPosts).then(r=>{
+    paginationPages = parseInt(r.headers['x-wp-totalpages']);
+    console.log('Total pages: ',parseInt(r.headers['x-wp-total']))
+    for (let i = 1; i < paginationPages+1; i++) {
+        axios.get(site+postOrPage[1]+websPagesOrPosts+'&page='+i).then(r=>{
+            r.data.forEach(e => {
+                let data = {
+                    title : e.title.rendered,
+                    link : e.link,
+                    content : e.content.rendered
+                }
+                arrPages.push(data);
+            });
+        }).then( r=> {
+            let jsonPages = {};
+            jsonPages.pages = arrPages;
+            fs.writeFileSync('pages.json',JSON.stringify(jsonPages));
+            if(paginationPages===i){
+                console.log('All pages written!');
+            }
+        })
+    }
+})
