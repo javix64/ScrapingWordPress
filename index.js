@@ -1,6 +1,12 @@
 const axios = require('axios');
 const fs = require('fs');
 
+//////////////////////////////////////////////////////////////////////////
+//
+// If you are reading this, maybe you don't understand it. Me neither :')
+//
+//////////////////////////////////////////////////////////////////////////
+
 const partialSite = process.argv[2]
 const site = 'https://'+partialSite+'/wp-json/wp/v2/'
 
