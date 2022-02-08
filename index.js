@@ -57,10 +57,11 @@ const listPosts =  async (url) => {
 //
 //////////////////////////////////////////////////////////////////////////
 const downloadPosts = async (url) =>{
-    await listPosts(url).then(e=>{e.map(i=>{
-        i.map(il=>{
-            console.log(il.title)
-        })
+    await listPosts(url).then(e=>{
+        e.map(i=>{
+            i.map(il=>{
+                console.log(il.title)
+            })
     })});
 }
 
