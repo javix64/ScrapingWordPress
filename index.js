@@ -12,32 +12,60 @@ const siteUrl = process.argv[2]
 const sitePosts = `https://${siteUrl}/wp-json/wp/v2/posts?per_page=100`;
 const sitePages = `https://${siteUrl}/wp-json/wp/v2/pages?per_page=100`;
 
-
+// can i group it in one function?
 const getAllPosts = (url) =>{
     return axios
         .get(url)
         .then(res =>{
-            const totalPages = res.headers['x-wp-totalpages'];
-            const totalItems = res.headers['x-wp-total'];
+            const totalPages = parseInt(res.headers['x-wp-totalpages'], 10);
+            const totalItems = parseInt(res.headers['x-wp-total'], 10);
             return {
                 totalPages,
                 totalItems
             }
         });
 }
-const downloadPosts = (url) => {
-    getAllPosts(url).then(e=>{
-        // per page crawled, save the data.
-    })
-}
-const allPages = (url) => {
+const getAllPages = (url) => {
     axios.get(sitePages).then(res =>{
 
     });
 }
 
+const listPosts =  async (url) => {
+    const urlPosts = await getAllPosts(url).then(e=>{
+        const { totalItems, totalPages} = e;
+        console.info('Total posts to download:', totalItems);
+        const urlPages = [];
+        for (let i = 1; i < totalPages +1; i++) {
+            const pagePost = `${sitePosts}&page=${i}`;
+            urlPages.push(pagePost);
+        }
+        return urlPages;
+    })
+    const promises = [];
+    for (let i = 0; i < urlPosts.length; i++) {
+        promises.push(axios.get(urlPosts[i]));
+    }
+    const data = Promise.all(promises).then(e=>{return e});
+    const mapPosts = (await data).map((element)=>{return element.data})
+    return mapPosts;
+}
+//////////////////////////////////////////////////////////////////////////
+//
+// It should be a better way to do the next function, but this is the only that i know is working.
+// If you know some different way, open an issue. Thanks :D.
+//
+//////////////////////////////////////////////////////////////////////////
+const downloadPosts = async (url) =>{
+    await listPosts(url).then(e=>{e.map(i=>{
+        i.map(il=>{
+            console.log(il.title)
+        })
+    })});
+}
+
+
 const main = () => {
-    //getAllPosts(posts);
     downloadPosts(sitePosts);
 }
 main();
