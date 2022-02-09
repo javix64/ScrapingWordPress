@@ -1,6 +1,6 @@
 # ScrapingWordPress
 
-This script download all pages and posts from a wordpress site and save it into a json file.
+This script download all pages and posts from a wordpress site and save it into a json file. In the folder: `json_downloaded`
 
 ## Install & Use
 
@@ -14,4 +14,8 @@ How to use it:
 
 `npm run download WEBSITE`
 
-WEBSITE format should be: `javix64.com`
+Example: 
+
+`npm run download myWordpressSite.com`
+
+Remember, use nomenclature: `myWordpressSite.com`, without any https.
