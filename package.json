@@ -4,7 +4,8 @@
   "description": "Script that download all pages and posts from a wordpress site",
   "main": "index.js",
   "scripts": {
-    "download": "node index.js"
+    "download": "node index.js",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,11 @@
   },
   "homepage": "https://github.com/javix64/ScrapingWordPress#readme",
   "dependencies": {
-    "axios": "^0.21.1"
+    "axios": "^0.21.1",
+    "inquirer": "^9.2.11"
+  },
+  "devDependencies": {
+    "@types/node": "^20.7.0",
+    "typescript": "^5.2.2"
   }
 }
