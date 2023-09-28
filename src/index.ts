@@ -1,25 +1,37 @@
-import axios from 'axios';
-import fs from 'fs';
-import inquirer from 'inquirer';
+import axios from "axios";
+import fs from "fs";
+import {extractDomain} from "./utils/index.ts";
+const inquirer = import("inquirer");
+class ScrapingWordPress {
+  url: string;
+  constructor(url: string) {
+    this.url = url;
+    this.getUrl();
+  }
+  async getUrl() {
+    if (this.url.length != 0) return;
+    const prompt = (await inquirer).createPromptModule();
+    return await prompt([
+      {
+        type: "input",
+        message: "Enter url that you want to scrap",
+        name: "url",
+      },
+    ]).then((answers) => {
+      this.url = extractDomain(answers.url);
+    });
+  }
+}
 
-class ScrapingWordPress{
-    url: string;
-    constructor(url:string){
-        this.url = url;
-    }
-    extractDomain(url:string) {
-        const domainWithParams = url.replace(/(^\w+:|^)\/\//, '');
-        const parts = domainWithParams.split('/')[0];
-        const domainWithoutParams = parts.split('?')[0];
-        return domainWithoutParams;
-    }
-    inquirerInput(){
-                
-    }
-};
-/*
+/**
+ * MUST:
+ * Which usage? Cli & Package
+ * FEATURES:
+ * show progress bar status
+ * for avoid problems with requests: save into file when it is done a request
+ * 
+ */
 
-*/
 // const baseUrl = `https://${siteUrl}/wp-json/wp/v2`;
 // const perPage = 100;
 
