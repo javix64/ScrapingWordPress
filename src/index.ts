@@ -1,35 +1,72 @@
 import axios from "axios";
 import fs from "fs";
-import {extractDomain} from "./utils/index.ts";
+import { extractDomain } from "./utils/index.ts";
 const inquirer = import("inquirer");
 class ScrapingWordPress {
   url: string;
-  constructor(url: string) {
-    this.url = url;
-    this.getUrl();
+  download: string;
+  fileName: string;
+  whatToDownload: string;
+  constructor() {
+    this.url, this.download, this.fileName, this.whatToDownload;
+    this.initCLI();
   }
-  async getUrl() {
-    if (this.url.length != 0) return;
+  async initCLI() {
     const prompt = (await inquirer).createPromptModule();
     return await prompt([
       {
         type: "input",
-        message: "Enter url that you want to scrap",
+        message: "Enter url that you want to scrape",
         name: "url",
+        validate: (url: string) => {
+          if (!url) return "Please enter a valid url";
+          if (!url.startsWith("https://") || url.startsWith("http://"))
+            return "Url should start by: http:// or https://";
+          return true;
+        },
       },
-    ]).then((answers) => {
-      this.url = extractDomain(answers.url);
+      {
+        type: "list",
+        message: "What do you want to download:",
+        choices: [{ name: "both" }, { name: "posts" }, { name: "pages" }],
+        name: "whatToDownload",
+        default: "both",
+      },
+      {
+        type: "confirm",
+        message: "Do you want to rename the output of file?",
+        default: false,
+        name: "wantToRename",
+      },
+      {
+        type: "input",
+        message: "Write the output file name",
+        name: "fileName",
+        when({wantToRename}) {return wantToRename === true},
+      },
+    ]).then(({ whatToDownload, url, fileName, wantToRename }) => {
+      this.url = url;
+      this.whatToDownload = whatToDownload;
+      this.fileName = fileName;
     });
   }
 }
+const pa = new ScrapingWordPress();
 
+export default ScrapingWordPress;
 /**
- * MUST:
+ * = MUST:
  * Which usage? Cli & Package
- * FEATURES:
+ * = FEATURES:
  * show progress bar status
  * for avoid problems with requests: save into file when it is done a request
- * 
+ * = STEPS:
+ * 1- Introduce URL
+ * 2- Ask if you want pages or posts or both.
+ * 3- Start to download that you want
+ * 4- After do the request, download the result.
+ * 5- Name each file: domain.pages.json / domain.posts.json
+ * 6- write the output in a folder called: domain
  */
 
 // const baseUrl = `https://${siteUrl}/wp-json/wp/v2`;
