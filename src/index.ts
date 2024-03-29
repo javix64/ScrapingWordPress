@@ -8,7 +8,7 @@ class ScrapingWordPress {
   fileName: string;
   whatToDownload: string;
   constructor() {
-    this.url, this.download, this.fileName, this.whatToDownload;
+    this.url, this.download, this.fileName;
     this.initCLI();
   }
   async initCLI() {
@@ -42,11 +42,13 @@ class ScrapingWordPress {
         type: "input",
         message: "Write the output file name",
         name: "fileName",
-        when({wantToRename}) {return wantToRename === true},
+        when({ wantToRename }) {
+          return wantToRename === true;
+        },
       },
-    ]).then(({ whatToDownload, url, fileName, wantToRename }) => {
+    ]).then(({ whatToDownload, url, fileName }) => {
       this.url = url;
-      this.whatToDownload = whatToDownload;
+      this.download = whatToDownload;
       this.fileName = fileName;
     });
   }
@@ -61,8 +63,8 @@ export default ScrapingWordPress;
  * show progress bar status
  * for avoid problems with requests: save into file when it is done a request
  * = STEPS:
- * 1- Introduce URL
- * 2- Ask if you want pages or posts or both.
+ * 1- Introduce URL - DONE
+ * 2- Ask if you want pages or posts or both. - DONE
  * 3- Start to download that you want
  * 4- After do the request, download the result.
  * 5- Name each file: domain.pages.json / domain.posts.json
